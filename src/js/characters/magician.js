@@ -4,9 +4,9 @@ export default class Magician extends Character {
   constructor(level, health) {
     super();
     this.level = level;
-    this.attack = 25;
-    this.defence = 25;
+    this.attack = 10;
+    this.defence = 40;
     this.health = health;
-    this.type = 'Magician';
+    this.type = 'magician';
   }
 }
