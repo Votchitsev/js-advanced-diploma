@@ -12,5 +12,8 @@
         "sourceType": "module"
     },
     "rules": {
+        "no-restricted-syntax": "off",
+        "no-alert": "off",
+        "arrow-parens": "off"
     }
 }
