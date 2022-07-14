@@ -18,4 +18,7 @@ test('check move space', () => {
     new Set([21, 22, 23, 29, 38, 47, 28, 36, 44, 52, 27,
       34, 41, 48, 19, 18, 17, 16, 11, 2, 12, 4, 13, 6]),
   );
+  expect(getSpace(56, character.moveDistance)).toStrictEqual(
+    new Set([48, 40, 32, 24, 49, 42, 35, 28, 57, 58, 59, 60]),
+  );
 });

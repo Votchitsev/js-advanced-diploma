@@ -3,6 +3,8 @@ import PositionedCharacter from './PositionedCharacter';
 import Team from './Team';
 import GamePlay from './GamePlay';
 import GameState from './GameState';
+import cursors from './cursors';
+import getSpace from './characters/moveOptions';
 
 export default class GameController {
   constructor(gamePlay, stateService) {
@@ -23,9 +25,12 @@ export default class GameController {
       ];
       this.gamePlay.redrawPositions(this.characterPositions);
     });
-    this.gamePlay.addCellEnterListener((index) => this.onCellEnter(index));
+    this.gamePlay.addCellEnterListener((index) => {
+      this.onCellEnter(index);
+      this.visualResponse(index);
+    });
     this.gamePlay.addCellLeaveListener((index) => this.onCellLeave(index));
-    this.gamePlay.addCellClickListener((index) => this.onCellClick(index)); 
+    this.gamePlay.addCellClickListener((index) => this.onCellClick(index));
     // TODO: load saved stated from stateService
   }
 
@@ -51,6 +56,7 @@ export default class GameController {
 
   onCellEnter(index) {
     const board = document.querySelectorAll('.cell');
+
     if (board[index].hasChildNodes()) {
       const characterObject = this.characterPositions.find(
         char => char.position === index,
@@ -60,9 +66,61 @@ export default class GameController {
         index,
       );
     }
+
+    if (GameState.choosenCharacter && !board[index].hasChildNodes()) {
+      const moveSpace = getSpace(
+        GameState.choosenCharacter.position,
+        GameState.choosenCharacter.character.moveDistance,
+      );
+      if (moveSpace.has(index)) {
+        this.gamePlay.setCursor(cursors.pointer);
+        this.gamePlay.selectCell(index, 'green');
+      } else {
+        this.gamePlay.setCursor(cursors.notallowed);
+        this.gamePlay.deselectCell(index);
+      }
+    }
+
+    if (GameState.choosenCharacter && board[index].hasChildNodes()) {
+      const attackSpace = getSpace(
+        GameState.choosenCharacter.position,
+        GameState.choosenCharacter.character.attackDistance,
+      );
+      const characterPosition = this.characterPositions.find(
+        char => char.position === index,
+      );
+
+      if (this.computerTeam.team.includes(characterPosition.character)) {
+        if (attackSpace.has(index)) {
+          this.gamePlay.setCursor(cursors.crosshair);
+          this.gamePlay.selectCell(index, 'red');
+        } else {
+          this.gamePlay.setCursor(cursors.notallowed);
+        }
+      }
+    }
   }
 
   onCellLeave(index) {
     this.gamePlay.hideCellTooltip(index);
+    const board = document.querySelectorAll('.cell');
+
+    if (board[index].classList.contains('selected-green', 'selected-red')) {
+      this.gamePlay.deselectCell(index);
+    }
+  }
+
+  visualResponse(index) {
+    const board = document.querySelectorAll('.cell');
+    if (board[index].hasChildNodes()) {
+      const characterPosition = this.characterPositions.find(
+        char => char.position === index,
+      );
+      if (this.userTeam.team.includes(characterPosition.character)) {
+        this.gamePlay.setCursor(cursors.pointer);
+      }
+    } else {
+      this.gamePlay.setCursor(cursors.auto);
+    }
   }
 }
