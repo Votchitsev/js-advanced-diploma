@@ -39,7 +39,7 @@ export default function getSpace(index, distance) {
             break;
           }
           if (index % 8 === 0) {
-            if (point % 7 === 0) {
+            if ((point + 1) % 8 === 0) {
               break;
             }
           }
