@@ -3,7 +3,7 @@ import getSpace from '../characters/moveOptions';
 
 test('check attack space', () => {
   const character = new Swordsman(1, 100);
-  expect(getSpace(63, character.attackDistanсe)).toStrictEqual(new Set([54, 55, 62]));
+  expect(getSpace(63, character.attackDistance)).toEqual(new Set([54, 55, 62]));
 });
 
 test('check move space', () => {

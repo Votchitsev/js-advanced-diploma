@@ -9,6 +9,6 @@ export default class Swordsman extends Character {
     this.health = health;
     this.type = 'swordsman';
     this.moveDistance = 4;
-    this.attackDistanсe = 1;
+    this.attackDistance = 1;
   }
 }

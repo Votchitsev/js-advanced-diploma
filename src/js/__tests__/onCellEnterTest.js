@@ -6,6 +6,8 @@
 import GameController from '../GameController';
 import GamePlay from '../GamePlay';
 import GameStateService from '../GameStateService';
+import GameState from '../GameState';
+import PositionedCharacter from '../PositionedCharacter';
 
 describe('creating new game', () => {
   const gamePlay = new GamePlay();
@@ -14,6 +16,9 @@ describe('creating new game', () => {
   const gameCtrl = new GameController(gamePlay, stateService);
   gameCtrl.init();
   gameCtrl.gamePlay.newGameEl.click();
+
+  const field = document.querySelectorAll('.cell');
+  const board = document.querySelector('.board');
 
   test('check show characters info', () => {
     expect(document).toMatchSnapshot();
@@ -24,7 +29,6 @@ describe('creating new game', () => {
   });
 
   test('choose another character', () => {
-    const field = document.querySelectorAll('.cell');
     const cellsHasCharacter = [];
     for (let i = 0; i < field.length; i += 1) {
       if (field[i].hasChildNodes()) {
@@ -40,5 +44,27 @@ describe('creating new game', () => {
     nextCharacterCell.click();
     expect(currentCharacterCell.classList).not.toContain('selected');
     expect(nextCharacterCell.classList).toContain('selected');
+  });
+
+  test('move visual response', () => {
+    gameCtrl.onCellEnter(58);
+    expect(field[58].classList).toContain('selected', 'selected-green');
+    expect(field[0].classList).not.toContain('selected');
+    expect(board.style.cursor).toBe('pointer');
+
+    gameCtrl.onCellEnter(0);
+    expect(board.style.cursor).toBe('not-allowed');
+  });
+
+  test('visual response from allowed attack', () => {
+    gameCtrl.characterPositions = [
+      new PositionedCharacter(gameCtrl.computerTeam.team[0], 48),
+      new PositionedCharacter(gameCtrl.userTeam.team[0], 56),
+    ];
+    gameCtrl.gamePlay.redrawPositions(gameCtrl.characterPositions);
+    field[56].click();
+    gameCtrl.onCellEnter(48);
+    expect(board.style.cursor).toBe('crosshair');
+    expect(field[48].classList).toContain('selected', 'selected-red');
   });
 });

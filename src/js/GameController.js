@@ -123,8 +123,6 @@ export default class GameController {
       if (this.userTeam.team.includes(characterPosition.character)) {
         this.gamePlay.setCursor(cursors.pointer);
       }
-    } else {
-      this.gamePlay.setCursor(cursors.auto);
     }
   }
 }
