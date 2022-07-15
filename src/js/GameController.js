@@ -49,6 +49,10 @@ export default class GameController {
         this.gamePlay.selectCell(index);
         GameState.choosenCharacter = characterPosition;
       } else {
+        if (GameState.choosenCharacter) {
+          GamePlay.showError('This action is not allowed!');
+          return;
+        }
         GamePlay.showError('This is not your character! Please chose another one.');
       }
     }
