@@ -51,9 +51,6 @@ describe('creating new game', () => {
     expect(field[58].classList).toContain('selected', 'selected-green');
     expect(field[0].classList).not.toContain('selected');
     expect(board.style.cursor).toBe('pointer');
-
-    gameCtrl.onCellEnter(0);
-    expect(board.style.cursor).toBe('not-allowed');
   });
 
   test('visual response from allowed attack', () => {
@@ -66,5 +63,13 @@ describe('creating new game', () => {
     gameCtrl.onCellEnter(48);
     expect(board.style.cursor).toBe('crosshair');
     expect(field[48].classList).toContain('selected', 'selected-red');
+  });
+
+  test('visual response with not allowed action', () => {
+    gameCtrl.onCellEnter(0);
+    expect(board.style.cursor).toBe('not-allowed');
+    GamePlay.showError = jest.fn();
+    gameCtrl.onCellClick(0);
+    expect(GamePlay.showError).toHaveBeenCalled();
   });
 });
