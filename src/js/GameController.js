@@ -36,9 +36,7 @@ export default class GameController {
   }
 
   onCellClick(index) {
-    const characterPosition = this.characterPositions.find(
-      char => char.position === index,
-    );
+    const characterPosition = this.getCharacterFromCell(index);
 
     if (GameState.turn === 'user') {
       if (this.board[index].hasChildNodes()) {
@@ -48,6 +46,13 @@ export default class GameController {
           }
           this.gamePlay.selectCell(index);
           GameState.choosenCharacter = characterPosition;
+        } else if (GameState.choosenCharacter
+          && this.checkEnemyOnCell(index)
+          && getSpace(
+            GameState.choosenCharacter.position,
+            GameState.choosenCharacter.character.attackDistance,
+          )) {
+          this.attack(index);
         } else if (GameState.choosenCharacter) {
           GamePlay.showError('This action is not allowed!');
         } else {
@@ -79,9 +84,8 @@ export default class GameController {
 
   onCellEnter(index) {
     if (this.board[index].hasChildNodes()) {
-      const characterObject = this.characterPositions.find(
-        char => char.position === index,
-      ).character;
+      const characterObject = this.getCharacterFromCell(index).character;
+
       this.gamePlay.showCellTooltip(
         `\u{1F396}${characterObject.level}\u{2694}${characterObject.attack}\u{1F6E1}${characterObject.defence}\u{2764}${characterObject.health}`,
         index,
@@ -107,9 +111,7 @@ export default class GameController {
         GameState.choosenCharacter.position,
         GameState.choosenCharacter.character.attackDistance,
       );
-      const characterPosition = this.characterPositions.find(
-        char => char.position === index,
-      );
+      const characterPosition = this.getCharacterFromCell(index);
 
       if (this.computerTeam.team.includes(characterPosition.character)) {
         if (attackSpace.has(index)) {
@@ -125,7 +127,8 @@ export default class GameController {
   onCellLeave(index) {
     this.gamePlay.hideCellTooltip(index);
 
-    if (this.board[index].classList.contains('selected-green', 'selected-red')) {
+    if (this.board[index].classList.contains('selected-green')
+    || this.board[index].classList.contains('selected-red')) {
       this.gamePlay.deselectCell(index);
     }
 
@@ -135,9 +138,7 @@ export default class GameController {
   visualResponse(index) {
     const board = document.querySelectorAll('.cell');
     if (board[index].hasChildNodes()) {
-      const characterPosition = this.characterPositions.find(
-        char => char.position === index,
-      );
+      const characterPosition = this.getCharacterFromCell(index);
       if (this.userTeam.team.includes(characterPosition.character)) {
         this.gamePlay.setCursor(cursors.pointer);
       }
@@ -148,20 +149,60 @@ export default class GameController {
     const previousPosition = GameState.choosenCharacter.position;
     GameState.choosenCharacter.position = moveIndex;
     this.gamePlay.redrawPositions(this.characterPositions);
-    this.board[previousPosition].classList.remove('selected', 'selected-yellow');
+    this.gamePlay.deselectCell(moveIndex);
+    this.gamePlay.deselectCell(previousPosition);
     GameState.choosenCharacter = null;
 
-    if (GameState.turn === 'user') {
-      GameState.turn = 'computer';
-      this.computerAction();
-    }
-    GameState.turn = 'user';
+    this.nextTurn();
+  }
+
+  attack(attackIndex) {
+    const enemyCharacter = this.getCharacterFromCell(attackIndex);
+    const damage = Math.max(
+      GameState.choosenCharacter.character.attack - enemyCharacter.character.defence,
+      GameState.choosenCharacter.character.attack * 0.1,
+    );
+    this.gamePlay.showDamage(attackIndex, `-${damage}`)
+      .then(() => {
+        enemyCharacter.character.health -= damage;
+        this.gamePlay.deselectCell(attackIndex);
+        this.gamePlay.deselectCell(GameState.choosenCharacter.position);
+        GameState.choosenCharacter = null;
+        this.gamePlay.redrawPositions(this.characterPositions);
+
+        this.nextTurn();
+      });
   }
 
   computerAction() {
     setTimeout(() => {
       console.log('computer action');
       GameState.turn = 'user';
-    }, 10000);
+    }, 3000);
+  }
+
+  checkEnemyOnCell(index) {
+    const enemyPositions = [];
+    this.characterPositions.forEach((element) => {
+      if (this.computerTeam.team.includes(element.character)) {
+        enemyPositions.push(element.position);
+      }
+    });
+    return enemyPositions.includes(index);
+  }
+
+  getCharacterFromCell(index) {
+    return this.characterPositions.find(
+      character => character.position === index,
+    );
+  }
+
+  nextTurn() {
+    if (GameState.turn === 'user') {
+      GameState.turn = 'computer';
+      this.computerAction();
+    } else {
+      GameState.turn = 'user';
+    }
   }
 }
