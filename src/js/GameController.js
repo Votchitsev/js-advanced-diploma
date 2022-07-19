@@ -5,6 +5,7 @@ import GamePlay from './GamePlay';
 import GameState from './GameState';
 import cursors from './cursors';
 import getSpace from './characters/moveOptions';
+import ComputerAction from './ComputerAction';
 
 export default class GameController {
   constructor(gamePlay, stateService) {
@@ -51,7 +52,7 @@ export default class GameController {
           && getSpace(
             GameState.choosenCharacter.position,
             GameState.choosenCharacter.character.attackDistance,
-          )) {
+          ).has(index)) {
           this.attack(index);
         } else if (GameState.choosenCharacter) {
           GamePlay.showError('This action is not allowed!');
@@ -176,8 +177,16 @@ export default class GameController {
 
   computerAction() {
     setTimeout(() => {
-      console.log('computer action');
-      GameState.turn = 'user';
+      const action = ComputerAction.run(
+        this.getCharactersFromTeam('computer'),
+        this.getCharactersFromTeam('user'),
+      );
+
+      if (action.action === 'attack') {
+        this.attack(action.target);
+      } else if (action.action === 'move') {
+        this.move(action.target);
+      }
     }, 3000);
   }
 
@@ -204,5 +213,21 @@ export default class GameController {
     } else {
       GameState.turn = 'user';
     }
+  }
+
+  getCharactersFromTeam(team) {
+    const result = [];
+    for (let i = 0; i < this.characterPositions.length; i += 1) {
+      if (team === 'user') {
+        if (this.userTeam.team.includes(this.characterPositions[i].character)) {
+          result.push(this.characterPositions[i]);
+        }
+      } else if (team === 'computer') {
+        if (this.computerTeam.team.includes(this.characterPositions[i].character)) {
+          result.push(this.characterPositions[i]);
+        }
+      }
+    }
+    return result;
   }
 }

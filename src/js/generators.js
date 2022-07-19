@@ -6,7 +6,7 @@
  * @returns Character type children (ex. Magician, Bowman, etc)
  */
 export function* characterGenerator(allowedTypes, maxLevel) {
-  const character = allowedTypes[Math.floor(Math.random() * allowedTypes.length)];
+  const character = new allowedTypes[Math.floor(Math.random() * allowedTypes.length)]();
   character.level = maxLevel;
   character.health = 100;
   yield character;
