@@ -169,6 +169,7 @@ export default class GameController {
         this.gamePlay.deselectCell(attackIndex);
         this.gamePlay.deselectCell(GameState.choosenCharacter.position);
         GameState.choosenCharacter = null;
+        this.checkAliveCharacters();
         this.gamePlay.redrawPositions(this.characterPositions);
 
         this.nextTurn();
@@ -229,5 +230,13 @@ export default class GameController {
       }
     }
     return result;
+  }
+
+  checkAliveCharacters() {
+    for (const character of this.characterPositions) {
+      if (character.character.health <= 0) {
+        this.characterPositions.splice(this.characterPositions.indexOf(character), 1);
+      }
+    }
   }
 }
