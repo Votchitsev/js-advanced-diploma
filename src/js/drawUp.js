@@ -2,7 +2,7 @@ import PositionedCharacter from './PositionedCharacter';
 
 export default function drawUp(characters, team) {
   const userPositions = [0, 8, 16, 24, 32, 40, 48, 56];
-  const computerPositions = [7, 15, 23, 31, 39, 47, 55, 63]
+  const computerPositions = [7, 15, 23, 31, 39, 47, 55, 63];
   const characterPositions = [];
 
   for (let i = 0; i < characters.length; i += 1) {

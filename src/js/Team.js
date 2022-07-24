@@ -7,7 +7,8 @@ import Undead from './characters/undead';
 import Vampire from './characters/vampire';
 
 export default class Team {
-  constructor() {
+  constructor(level = 1) {
+    this.level = level;
     const newTeam = generateTeam([
       Bowman,
       Daemon,
@@ -15,7 +16,7 @@ export default class Team {
       Swordsman,
       Undead,
       Vampire,
-    ], 1, 2);
+    ], level, 2);
     this.team = newTeam;
   }
 }

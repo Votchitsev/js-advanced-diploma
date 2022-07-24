@@ -23,7 +23,7 @@ export default class ComputerAction {
       );
       for (let j = 0; j < this.userTeam.length; j += 1) {
         if (computerAttackValid.has(this.userTeam[j].position)) {
-          GameState.choosenCharacter = this.computerTeam[i];
+          GameState.state.choosenCharacter = this.computerTeam[i];
           return this.userTeam[j].position;
         }
       }
@@ -36,7 +36,7 @@ export default class ComputerAction {
     const characterToMove = moveOptions[
       Math.floor(Math.random() * (moveOptions.length - 0) + 0)
     ];
-    GameState.choosenCharacter = characterToMove.character;
+    GameState.state.choosenCharacter = characterToMove.character;
     return {
       action: 'move',
       target: characterToMove.targets[0].target,

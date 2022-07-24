@@ -3,8 +3,18 @@ export default class GameState {
 
   static turn = 'user';
 
+  static score = null;
+
+  static status = 'run';
+
+  static state = {};
+
   static from(object) {
-    // TODO: create object
+    for (const key in object) {
+      if (Object.prototype.hasOwnProperty.call(object, key)) {
+        this.state[key] = object[key];
+      }
+    }
     return null;
   }
 }
