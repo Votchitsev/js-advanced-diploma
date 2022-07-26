@@ -12,10 +12,10 @@ export function* characterGenerator(allowedTypes, maxLevel) {
   yield character;
 }
 
-export function generateTeam(allowedTypes, maxLevel, characterCount) {
+export function generateTeam(allowedTypes, maxLevel, characterCount, aliveCharacters) {
   const team = [];
-  for (let i = 0; i < characterCount; i += 1) {
+  for (let i = 0; i < characterCount - aliveCharacters.length; i += 1) {
     team.push(characterGenerator(allowedTypes, maxLevel).next().value);
   }
-  return team;
+  return team.concat(aliveCharacters);
 }
