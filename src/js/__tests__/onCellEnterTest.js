@@ -6,7 +6,6 @@
 import GameController from '../GameController';
 import GamePlay from '../GamePlay';
 import GameStateService from '../GameStateService';
-import GameState from '../GameState';
 import PositionedCharacter from '../PositionedCharacter';
 
 describe('creating new game', () => {
@@ -14,8 +13,14 @@ describe('creating new game', () => {
   gamePlay.bindToDOM(document.querySelector('#game-container'));
   const stateService = new GameStateService(localStorage);
   const gameCtrl = new GameController(gamePlay, stateService);
+
   gameCtrl.init();
-  gameCtrl.gamePlay.newGameEl.click();
+
+  gameCtrl.characterPositions[0].position = 56;
+  gameCtrl.characterPositions[1].position = 57;
+  gameCtrl.characterPositions[2].position = 62;
+  gameCtrl.characterPositions[3].position = 63;
+  gameCtrl.gamePlay.redrawPositions(gameCtrl.characterPositions);
 
   const field = document.querySelectorAll('.cell');
   const board = document.querySelector('.board');
