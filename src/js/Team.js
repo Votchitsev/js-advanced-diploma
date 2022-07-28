@@ -16,7 +16,7 @@ export default class Team {
       Swordsman,
       Undead,
       Vampire,
-    ], Math.floor(Math.random() * level), count, aliveCharacters);
+    ], Math.floor(1 + Math.random() * level), count, aliveCharacters);
     this.team = newTeam;
   }
 }

@@ -19,6 +19,16 @@ export default class GameController {
     // draw Ui
     if (!data) {
       this.gamePlay.drawUi(themes.prairie);
+      GameState.from(
+        {
+          choosenCharacter: null,
+          turn: 'user',
+          status: 'run',
+          score: 0,
+          maxScore: 0,
+          level: 1,
+        },
+      );
     } else {
       const themesList = ['prairie', 'desert', 'arctic', 'mountain'];
       this.gamePlay.drawUi(themes[themesList[data.level - 1]]);
@@ -26,26 +36,20 @@ export default class GameController {
         choosenCharacter: null,
         turn: 'user',
         score: data.score,
+        maxScore: data.maxScore,
         level: data.level,
+        userTeam: GameState.objectToClass(data.userTeam),
       };
     }
 
     // set event listeners
     // new game listener
     this.gamePlay.addNewGameListener(() => {
-      this.stateService.storage.clear();
-      GameState.from(
-        {
-          choosenCharacter: null,
-          turn: 'user',
-          status: 'run',
-          score: null,
-          level: 1,
-        },
-      );
+      localStorage.clear();
       this.resetListeners();
       this.init();
     });
+
     // add enter event listeners
     this.gamePlay.addCellEnterListener((index) => {
       this.onCellEnter(index);
@@ -56,12 +60,16 @@ export default class GameController {
     // add click event listener
     this.gamePlay.addCellClickListener((index) => this.onCellClick(index));
     // set property board
-    this.startGame();
+    this.startGame(GameState.state.level);
   }
 
-  startGame() {
-    this.userTeam = new Team();
-    this.computerTeam = new Team();
+  startGame(level) {
+    if (GameState.state.userTeam) {
+      this.userTeam = new Team(GameState.state.userTeam, level, level + 1);
+    } else {
+      this.userTeam = new Team();
+    }
+    this.computerTeam = new Team([], level, level + 1);
     this.characterPositions = drawUp(this.userTeam.team, 'user')
       .concat(drawUp(this.computerTeam.team, 'computer'));
     this.gamePlay.redrawPositions(this.characterPositions);
@@ -291,41 +299,50 @@ export default class GameController {
     }
     if (this.computerTeam.team.length === 0) {
       GameState.state.status = 'stop';
-      this.levelUp();
+
+      if (GameState.state.level <= 4) {
+        this.levelUp();
+      } else {
+        this.gamePlay.cellClickListeners = [];
+      }
     } else if (this.userTeam.team.length === 0) {
       this.gamePlay.cellClickListeners = [];
     }
   }
 
   levelUp() {
-    // get health sum of alive user characters
-    GameState.state.score += this.userTeam.team.reduce((a, b) => a.health + b.health);
-    // // up level characters and up health
-    // for (const character of this.userTeam.team) {
-    //   // set character health before
-    //   const healthBefore = character.health;
-    //   // up leve and health
-    //   character.level += 1;
-    //   character.health += 80;
-    //   if (character.health > 100) {
-    //     character.health = 100;
-    //   }
-    //   // up attack
-    //   const changedAttack = Math.max(
-    //     character.attack,
-    //     character.attack * (1.8 - (healthBefore / 100)),
-    //   );
-    //   character.attack = changedAttack;
-    //   // up defence
-    //   const changedDefence = Math.max(
-    //     character.defence,
-    //     character.defence * (1.8 - (healthBefore / 100)),
-    //   );
-    //   character.defence = changedDefence;
-    // }
-    // // save game
+    const { maxScore } = GameState.state;
+    const currentScore = this.userTeam.team.reduce((a, b) => a.health + b.health);
+
+    if (currentScore > maxScore) {
+      GameState.state.maxScore = currentScore;
+    }
+
     GameState.state.level += 1;
-    GameState.state.turn = 'user';
+    GameState.state.score += currentScore;
+
+    for (const character of this.userTeam.team) {
+      const healthBefore = character.health;
+      character.level += 1;
+      character.health += 80;
+      if (character.health > 100) {
+        character.health = 100;
+      }
+      // up attack
+      const changedAttack = Math.max(
+        character.attack,
+        character.attack * (1.8 - (healthBefore / 100)),
+      );
+      character.attack = changedAttack;
+      // up defence
+      const changedDefence = Math.max(
+        character.defence,
+        character.defence * (1.8 - (healthBefore / 100)),
+      );
+      character.defence = changedDefence;
+    }
+    // save game
+    GameState.state.userTeam = this.userTeam.team;
     this.stateService.save(GameState.state);
     GameState.state = null;
     this.resetListeners();
