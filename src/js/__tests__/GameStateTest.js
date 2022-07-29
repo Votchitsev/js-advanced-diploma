@@ -7,5 +7,5 @@ const stateInfo = {
 
 test('create state info', () => {
   GameState.from(stateInfo);
-  expect(GameState.state.key1).toBe('val1')
+  expect(GameState.state.key1).toBe('val1');
 });

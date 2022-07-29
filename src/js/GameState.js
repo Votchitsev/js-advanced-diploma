@@ -28,6 +28,10 @@ export default class GameState {
   static objectToClass(objects) {
     const objectClasses = [];
 
+    if (!objects) {
+      return null;
+    }
+
     for (const object of objects) {
       let character;
       switch (object.type) {

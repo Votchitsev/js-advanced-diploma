@@ -39,6 +39,7 @@ export default class GameController {
         maxScore: data.maxScore,
         level: data.level,
         userTeam: GameState.objectToClass(data.userTeam),
+        characterPositions: data.characterPositions,
       };
     }
 
@@ -59,6 +60,8 @@ export default class GameController {
     this.gamePlay.addCellLeaveListener((index) => this.onCellLeave(index));
     // add click event listener
     this.gamePlay.addCellClickListener((index) => this.onCellClick(index));
+    // add save game listener
+    this.gamePlay.addSaveGameListener(() => this.saveGame());
     // set property board
     this.startGame(GameState.state.level);
   }
@@ -347,6 +350,14 @@ export default class GameController {
     GameState.state = null;
     this.resetListeners();
     this.init();
+  }
+
+  /*
+  * save current game state
+  */
+  saveGame() {
+    GameState.state.characterPositions = this.characterPositions;
+    this.stateService.save(GameState.state);
   }
 
   resetListeners() {
