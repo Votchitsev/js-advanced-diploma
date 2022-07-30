@@ -7,23 +7,13 @@ import Vampire from './characters/vampire';
 import PositionedCharacter from './PositionedCharacter';
 
 export default class GameState {
-  // static choosenCharacter = null;
-
-  // static turn = 'user';
-
-  // static score = null;
-
-  // static status = 'run';
-
-  // static state = {};
-
   static from(object) {
     for (const key in object) {
       if (Object.prototype.hasOwnProperty.call(object, key)) {
         if (key === 'userTeam' || key === 'computerTeam') {
-          this[key] = this.teamParse(object[key]);
-        } else if (key === 'characterPositions') {
-          this[key] = this.characterPositionParse(object[key]);
+          this[key] = this.teamParse(object[key].team);
+        } else if (key === 'characters') {
+          this[key] = this.characterParse(object[key]);
         } else {
           this[key] = object[key];
         }
@@ -31,6 +21,20 @@ export default class GameState {
     }
 
     return null;
+  }
+
+  static characterParse(objectsList) {
+    const result = [];
+
+    for (const object of objectsList) {
+      result.push({
+        character: this.teamParse(object.character)[0],
+        position: object.position,
+        team: object.team,
+      });
+    }
+
+    return result;
   }
 
   static characterPositionParse(objectsList) {
@@ -92,5 +96,14 @@ export default class GameState {
     //   return objectClasses[0];
     // }
     return objectClasses;
+  }
+
+  static toObject() {
+    const result = {};
+
+    for (const key of Object.keys(this)) {
+      result[key] = this[key];
+    }
+    return result;
   }
 }

@@ -6,6 +6,7 @@ import cursors from './cursors';
 import getSpace from './characters/moveOptions';
 import ComputerAction from './ComputerAction';
 import drawUp from './drawUp';
+import PositionedCharacter from './PositionedCharacter';
 
 export default class GameController {
   constructor(gamePlay, stateService) {
@@ -30,25 +31,18 @@ export default class GameController {
         },
       );
     } else {
-      const themesList = ['prairie', 'desert', 'arctic', 'mountain'];
-      this.gamePlay.drawUi(themes[themesList[data.level - 1]]);
-      GameState.state = {
-        choosenCharacter: null,
-        turn: 'user',
-        score: data.score,
-        maxScore: data.maxScore,
-        level: data.level,
-        userTeam: GameState.objectToClass(data.userTeam),
-        characterPositions: data.characterPositions,
-      };
+      GameState.from(data);
     }
-
     // set event listeners
     // new game listener
     this.gamePlay.addNewGameListener(() => {
-      localStorage.clear();
-      this.resetListeners();
-      this.init();
+      GameState.level = 1;
+      GameState.choosenCharacter = null;
+      GameState.turn = 'user';
+      this.characterPositions = null;
+      this.userTeam = null;
+      this.computerTeam = null;
+      this.startGame(GameState.level);
     });
 
     // add enter event listeners
@@ -62,63 +56,79 @@ export default class GameController {
     this.gamePlay.addCellClickListener((index) => this.onCellClick(index));
     // add save game listener
     this.gamePlay.addSaveGameListener(() => this.saveGame());
-    // set property board
-    this.startGame(GameState.state.level);
+    //  add load game listener
+    this.gamePlay.addLoadGameListener(() => this.loadGame());
+
+    if (this.characterPositions) {
+      this.gamePlay.redrawPositions(this.characterPositions);
+    } else {
+      this.startGame(GameState.level);
+    }
   }
 
   startGame(level) {
-    if (GameState.state.userTeam) {
-      this.userTeam = new Team(GameState.state.userTeam, level, level + 1);
+    this.setTheme(level);
+
+    if (this.userTeam) {
+      this.userTeam = new Team(this.userTeam.team, level, level + 1);
     } else {
       this.userTeam = new Team();
     }
-    this.computerTeam = new Team([], level, level + 1);
-    this.characterPositions = drawUp(this.userTeam.team, 'user')
-      .concat(drawUp(this.computerTeam.team, 'computer'));
+
+    if (!this.computerTeam) {
+      this.computerTeam = new Team([], level, level + 1);
+    }
+
+    if (!this.characterPositions) {
+      this.characterPositions = drawUp(this.userTeam.team, 'user')
+        .concat(drawUp(this.computerTeam.team, 'computer'));
+    }
+
     this.gamePlay.redrawPositions(this.characterPositions);
-    GameState.state.status = 'run';
+
+    GameState.status = 'run';
   }
 
   onCellClick(index) {
     const board = document.querySelectorAll('.cell');
     const characterPosition = this.getCharacterFromCell(index);
-    if (GameState.state.turn === 'user') {
+    if (GameState.turn === 'user') {
       if (board[index].hasChildNodes()) {
         if (this.userTeam.team.includes(characterPosition.character)) {
-          if (GameState.state.choosenCharacter) {
-            this.gamePlay.deselectCell(GameState.state.choosenCharacter.position);
+          if (GameState.choosenCharacter) {
+            this.gamePlay.deselectCell(GameState.choosenCharacter.position);
           }
           this.gamePlay.selectCell(index);
-          GameState.state.choosenCharacter = characterPosition;
-        } else if (GameState.state.choosenCharacter
+          GameState.choosenCharacter = characterPosition;
+        } else if (GameState.choosenCharacter
           && this.checkEnemyOnCell(index)
           && getSpace(
-            GameState.state.choosenCharacter.position,
-            GameState.state.choosenCharacter.character.attackDistance,
+            GameState.choosenCharacter.position,
+            GameState.choosenCharacter.character.attackDistance,
           ).has(index)) {
           this.attack(index);
-        } else if (GameState.state.choosenCharacter) {
+        } else if (GameState.choosenCharacter) {
           GamePlay.showError('This action is not allowed!');
         } else {
           GamePlay.showError('This is not your character! Please chose another one.');
         }
       }
       if (!board[index].hasChildNodes()
-      && GameState.state.choosenCharacter) {
+      && GameState.choosenCharacter) {
         if (!getSpace(
-          GameState.state.choosenCharacter.position,
-          GameState.state.choosenCharacter.character.moveDistance,
+          GameState.choosenCharacter.position,
+          GameState.choosenCharacter.character.moveDistance,
         ).has(index)
         && !getSpace(
-          GameState.state.choosenCharacter.position,
-          GameState.state.choosenCharacter.character.attackDistance,
+          GameState.choosenCharacter.position,
+          GameState.choosenCharacter.character.attackDistance,
         ).has(index)) {
           GamePlay.showError('This action is not allowed!');
         }
 
         if (getSpace(
-          GameState.state.choosenCharacter.position,
-          GameState.state.choosenCharacter.character.moveDistance,
+          GameState.choosenCharacter.position,
+          GameState.choosenCharacter.character.moveDistance,
         ).has(index)) {
           this.move(index);
         }
@@ -137,10 +147,10 @@ export default class GameController {
       );
     }
 
-    if (GameState.state.choosenCharacter && !board[index].hasChildNodes()) {
+    if (GameState.choosenCharacter && !board[index].hasChildNodes()) {
       const moveSpace = getSpace(
-        GameState.state.choosenCharacter.position,
-        GameState.state.choosenCharacter.character.moveDistance,
+        GameState.choosenCharacter.position,
+        GameState.choosenCharacter.character.moveDistance,
       );
       if (moveSpace.has(index)) {
         this.gamePlay.setCursor(cursors.pointer);
@@ -151,10 +161,10 @@ export default class GameController {
       }
     }
 
-    if (GameState.state.choosenCharacter && board[index].hasChildNodes()) {
+    if (GameState.choosenCharacter && board[index].hasChildNodes()) {
       const attackSpace = getSpace(
-        GameState.state.choosenCharacter.position,
-        GameState.state.choosenCharacter.character.attackDistance,
+        GameState.choosenCharacter.position,
+        GameState.choosenCharacter.character.attackDistance,
       );
       const characterPosition = this.getCharacterFromCell(index);
 
@@ -192,33 +202,33 @@ export default class GameController {
   }
 
   move(moveIndex) {
-    const previousPosition = GameState.state.choosenCharacter.position;
-    GameState.state.choosenCharacter.position = moveIndex;
+    const previousPosition = GameState.choosenCharacter.position;
+    GameState.choosenCharacter.position = moveIndex;
     this.gamePlay.redrawPositions(this.characterPositions);
     this.gamePlay.deselectCell(moveIndex);
     this.gamePlay.deselectCell(previousPosition);
-    GameState.state.choosenCharacter = null;
+    GameState.choosenCharacter = null;
 
     this.nextTurn();
   }
 
   attack(attackIndex) {
     const enemyCharacter = this.getCharacterFromCell(attackIndex);
-    const currentLevel = GameState.state.level;
+    const currentLevel = GameState.level;
     const damage = Math.max(
-      GameState.state.choosenCharacter.character.attack - enemyCharacter.character.defence,
-      GameState.state.choosenCharacter.character.attack * 0.1,
+      GameState.choosenCharacter.character.attack - enemyCharacter.character.defence,
+      GameState.choosenCharacter.character.attack * 0.1,
     );
     this.gamePlay.showDamage(attackIndex, `-${damage}`)
       .then(() => {
         enemyCharacter.character.health -= damage;
         this.gamePlay.deselectCell(attackIndex);
-        this.gamePlay.deselectCell(GameState.state.choosenCharacter.position);
-        GameState.state.choosenCharacter = null;
+        this.gamePlay.deselectCell(GameState.choosenCharacter.position);
+        GameState.choosenCharacter = null;
       })
       .then(() => {
         this.gameLoop();
-        if (currentLevel === GameState.state.level) {
+        if (currentLevel === GameState.level) {
           return true;
         }
         return false;
@@ -263,13 +273,13 @@ export default class GameController {
   }
 
   nextTurn() {
-    if (GameState.state.turn === 'user') {
-      GameState.state.turn = 'computer';
+    if (GameState.turn === 'user') {
+      GameState.turn = 'computer';
       if (this.computerTeam.team.length > 0) {
         this.computerAction();
       }
     } else {
-      GameState.state.turn = 'user';
+      GameState.turn = 'user';
     }
   }
 
@@ -301,9 +311,9 @@ export default class GameController {
       }
     }
     if (this.computerTeam.team.length === 0) {
-      GameState.state.status = 'stop';
+      GameState.status = 'stop';
 
-      if (GameState.state.level <= 4) {
+      if (GameState.level <= 4) {
         this.levelUp();
       } else {
         this.gamePlay.cellClickListeners = [];
@@ -314,15 +324,15 @@ export default class GameController {
   }
 
   levelUp() {
-    const { maxScore } = GameState.state;
+    const { maxScore } = GameState;
     const currentScore = this.userTeam.team.reduce((a, b) => a.health + b.health);
 
     if (currentScore > maxScore) {
-      GameState.state.maxScore = currentScore;
+      GameState.maxScore = currentScore;
     }
 
-    GameState.state.level += 1;
-    GameState.state.score += currentScore;
+    GameState.level += 1;
+    GameState.score += currentScore;
 
     for (const character of this.userTeam.team) {
       const healthBefore = character.health;
@@ -345,24 +355,70 @@ export default class GameController {
       character.defence = changedDefence;
     }
     // save game
-    GameState.state.userTeam = this.userTeam.team;
-    this.stateService.save(GameState.state);
-    GameState.state = null;
-    this.resetListeners();
-    this.init();
+    GameState.userTeam = this.userTeam.team;
+    this.startGame(GameState.level);
   }
 
   /*
   * save current game state
   */
   saveGame() {
-    GameState.state.characterPositions = this.characterPositions;
-    this.stateService.save(GameState.state);
+    // GameState.characterPositions = this.characterPositions;
+    // GameState.userTeam = this.userTeam;
+    // GameState.computerTeam = this.computerTeam;
+
+    const characters = [];
+
+    for (const char of this.characterPositions) {
+      const character = {
+        character: char.character,
+        position: char.position,
+      };
+
+      if (this.userTeam.team.includes(char.character)) {
+        character.team = 'user';
+      } else if (this.computerTeam.team.includes(char.character)) {
+        character.team = 'computer';
+      }
+      characters.push(character);
+    }
+
+    GameState.characters = characters;
+
+    this.stateService.save(GameState.toObject());
+  }
+
+  loadGame() {
+    GameState.from(this.stateService.load());
+    const characterPositions = [];
+    const userTeam = [];
+    const computerTeam = [];
+
+    for (const char of GameState.characters) {
+      const characterPosition = new PositionedCharacter(char.character, char.position);
+      characterPositions.push(characterPosition);
+      if (char.team === 'user') {
+        userTeam.push(char.character);
+      } else if (char.team === 'computer') {
+        computerTeam.push(char.character);
+      }
+    }
+    this.characterPositions = characterPositions;
+    this.userTeam.team = userTeam;
+    this.userTeam.level = GameState.level;
+    this.computerTeam.team = computerTeam;
+    this.computerTeam.level = GameState.level;
+    this.startGame(GameState.level);
   }
 
   resetListeners() {
     this.gamePlay.cellClickListeners = [];
     this.gamePlay.cellEnterListeners = [];
     this.gamePlay.cellLeaveListeners = [];
+  }
+
+  setTheme(level) {
+    const themesList = ['prairie', 'desert', 'arctic', 'mountain'];
+    this.gamePlay.drawUi(themes[themesList[level - 1]]);
   }
 }
