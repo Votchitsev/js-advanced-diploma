@@ -36,7 +36,7 @@ function getStaticSpace(distance, action) {
   return result;
 }
 
-export default function getSpace(index, distance, action) {
+export default function getSpace(index, distance, action, ocuppiedCells = []) {
   const staticSpace = getStaticSpace(distance, action);
   const result = [];
   if (action === 'move') {
@@ -45,7 +45,7 @@ export default function getSpace(index, distance, action) {
         const moveDirection = staticSpace[direction].map((element) => element + index);
         for (let i = 0; i < moveDirection.length; i += 1) {
           const point = moveDirection[i];
-          if (point >= 0 && point <= 63) {
+          if (point >= 0 && point <= 63 && !ocuppiedCells.includes(point)) {
             if ((direction === 'upLeft' || direction === 'left' || direction === 'downLeft') && point % 8 === 0) {
               result.push(point);
               break;

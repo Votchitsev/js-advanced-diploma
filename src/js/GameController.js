@@ -111,6 +111,7 @@ export default class GameController {
           && getSpace(
             GameState.choosenCharacter.position,
             GameState.choosenCharacter.character.attackDistance,
+            'attack',
           ).has(index)) {
           this.attack(index);
         } else if (GameState.choosenCharacter) {
@@ -124,10 +125,13 @@ export default class GameController {
         if (!getSpace(
           GameState.choosenCharacter.position,
           GameState.choosenCharacter.character.moveDistance,
+          'move',
+          this.getOccupiedCells(),
         ).has(index)
         && !getSpace(
           GameState.choosenCharacter.position,
           GameState.choosenCharacter.character.attackDistance,
+          'attack',
         ).has(index)) {
           GamePlay.showError('This action is not allowed!');
         }
@@ -135,6 +139,8 @@ export default class GameController {
         if (getSpace(
           GameState.choosenCharacter.position,
           GameState.choosenCharacter.character.moveDistance,
+          'move',
+          this.getOccupiedCells(),
         ).has(index)) {
           this.move(index);
         }
@@ -426,5 +432,13 @@ export default class GameController {
   setTheme(level) {
     const themesList = ['prairie', 'desert', 'arctic', 'mountain'];
     this.gamePlay.drawUi(themes[themesList[level - 1]]);
+  }
+
+  getOccupiedCells() {
+    const positions = [];
+    for (const charPos of this.characterPositions) {
+      positions.push(charPos.position);
+    }
+    return positions;
   }
 }

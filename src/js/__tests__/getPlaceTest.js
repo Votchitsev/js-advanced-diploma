@@ -22,7 +22,7 @@ test('check move space', () => {
   expect(getSpace(56, character.moveDistance, 'move')).toStrictEqual(
     new Set([48, 40, 32, 24, 49, 42, 35, 28, 57, 58, 59, 60]),
   );
-  expect(getSpace(8, character.moveDistance, 'move')).toStrictEqual(
-    new Set([0, 1, 9, 10, 11, 12, 17, 26, 35, 44, 16, 24, 32, 40]),
+  expect(getSpace(8, character.moveDistance, 'move', [40])).toStrictEqual(
+    new Set([0, 1, 9, 10, 11, 12, 17, 26, 35, 44, 16, 24, 32]),
   );
 });
