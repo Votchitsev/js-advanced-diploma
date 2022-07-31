@@ -163,6 +163,8 @@ export default class GameController {
       const moveSpace = getSpace(
         GameState.choosenCharacter.position,
         GameState.choosenCharacter.character.moveDistance,
+        'move',
+        this.getOccupiedCells(),
       );
       if (moveSpace.has(index)) {
         this.gamePlay.setCursor(cursors.pointer);
@@ -177,6 +179,7 @@ export default class GameController {
       const attackSpace = getSpace(
         GameState.choosenCharacter.position,
         GameState.choosenCharacter.character.attackDistance,
+        'attack',
       );
       const characterPosition = this.getCharacterFromCell(index);
 
@@ -258,6 +261,7 @@ export default class GameController {
       const action = ComputerAction.run(
         this.getCharactersFromTeam('computer'),
         this.getCharactersFromTeam('user'),
+        this.getOccupiedCells(),
       );
 
       if (action.action === 'attack') {

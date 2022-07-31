@@ -2,9 +2,10 @@ import getSpace from './characters/moveOptions';
 import GameState from './GameState';
 
 export default class ComputerAction {
-  static run(computer, user) {
+  static run(computer, user, ocuppiedCells) {
     this.computerTeam = computer;
     this.userTeam = user;
+    this.ocuppiedCells = ocuppiedCells;
     if (this.attack()) {
       return {
         action: 'attack',
@@ -20,6 +21,7 @@ export default class ComputerAction {
       const computerAttackValid = getSpace(
         this.computerTeam[i].position,
         this.computerTeam[i].character.attackDistance,
+        'attack',
       );
       for (let j = 0; j < this.userTeam.length; j += 1) {
         if (computerAttackValid.has(this.userTeam[j].position)) {
@@ -53,6 +55,8 @@ export default class ComputerAction {
       const computerMoveValid = getSpace(
         this.computerTeam[i].position,
         this.computerTeam[i].character.moveDistance,
+        'move',
+        this.ocuppiedCells,
       );
 
       for (let j = 0; j < this.userTeam.length; j += 1) {

@@ -7,16 +7,44 @@ import Undead from './characters/undead';
 import Vampire from './characters/vampire';
 
 export default class Team {
-  constructor(aliveCharacters = [], level = 1, count = 2) {
+  constructor(aliveCharacters = [], level = 1, player = 'user', enemyCount = 2) {
     this.level = level;
-    const newTeam = generateTeam([
-      Bowman,
-      Daemon,
-      Magician,
-      Swordsman,
-      Undead,
-      Vampire,
-    ], Math.floor(1 + Math.random() * level), count, aliveCharacters);
+    this.player = player;
+    this.aliveCharacters = aliveCharacters;
+    this.enemyCount = enemyCount;
+
+    const newTeam = generateTeam(
+      this.allowCharacterList(level, player),
+      Math.floor(1 + Math.random() * level),
+      this.count(),
+      aliveCharacters,
+    );
     this.team = newTeam;
+  }
+
+  allowCharacterList() {
+    if (this.level === 1 && this.player === 'user') {
+      return [Bowman, Swordsman];
+    }
+
+    return [Bowman, Daemon, Magician, Swordsman, Undead, Vampire];
+  }
+
+  count() {
+    if (this.player === 'user') {
+      if (this.level === 2) {
+        return this.aliveCharacters.length + 1;
+      }
+
+      if (this.level === 3 || this.level === 4) {
+        return this.aliveCharacters.length + 2;
+      }
+    }
+
+    if (this.player === 'computer') {
+      return this.enemyCount;
+    }
+
+    return 2;
   }
 }
