@@ -33,31 +33,8 @@ export default class GameController {
     } else {
       GameState.from(data);
     }
-    // set event listeners
-    // new game listener
-    this.gamePlay.addNewGameListener(() => {
-      GameState.level = 1;
-      GameState.choosenCharacter = null;
-      GameState.turn = 'user';
-      this.characterPositions = null;
-      this.userTeam = null;
-      this.computerTeam = null;
-      this.startGame(GameState.level);
-    });
 
-    // add enter event listeners
-    this.gamePlay.addCellEnterListener((index) => {
-      this.onCellEnter(index);
-      this.visualResponse(index);
-    });
-    // add leave event listener
-    this.gamePlay.addCellLeaveListener((index) => this.onCellLeave(index));
-    // add click event listener
-    this.gamePlay.addCellClickListener((index) => this.onCellClick(index));
-    // add save game listener
-    this.gamePlay.addSaveGameListener(() => this.saveGame());
-    //  add load game listener
-    this.gamePlay.addLoadGameListener(() => this.loadGame());
+    this.setListeners();
 
     if (this.characterPositions) {
       this.gamePlay.redrawPositions(this.characterPositions);
@@ -84,9 +61,38 @@ export default class GameController {
         .concat(drawUp(this.computerTeam.team, 'computer'));
     }
 
+    if (this.gamePlay.cellClickListeners.length === 0) {
+      this.setListeners();
+    }
+
     this.gamePlay.redrawPositions(this.characterPositions);
 
     GameState.status = 'run';
+  }
+
+  setListeners() {
+    this.gamePlay.addNewGameListener(() => {
+      GameState.level = 1;
+      GameState.choosenCharacter = null;
+      GameState.turn = 'user';
+      this.characterPositions = null;
+      this.userTeam = null;
+      this.computerTeam = null;
+      this.startGame(GameState.level);
+    });
+
+    this.gamePlay.addCellEnterListener((index) => {
+      this.onCellEnter(index);
+      this.visualResponse(index);
+    });
+
+    this.gamePlay.addCellLeaveListener((index) => this.onCellLeave(index));
+
+    this.gamePlay.addCellClickListener((index) => this.onCellClick(index));
+
+    this.gamePlay.addSaveGameListener(() => this.saveGame());
+
+    this.gamePlay.addLoadGameListener(() => this.loadGame());
   }
 
   onCellClick(index) {

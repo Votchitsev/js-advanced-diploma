@@ -90,6 +90,8 @@ Thumbs.db:encryptable
 #snapshots
 src/js/__tests__/__snapshots__/
 
+#studentIgnoreFiles
 appArchitecture.txt
 arch.md
 .vscode/
+todo
