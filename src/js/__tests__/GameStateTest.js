@@ -23,7 +23,6 @@ test('create state info', () => {
   expect(GameState.key1).toBe('val1');
 });
 
-
 test('check character is instance of class', () => {
   expect(GameState.characters[0].character).toBeInstanceOf(Swordsman);
 });
