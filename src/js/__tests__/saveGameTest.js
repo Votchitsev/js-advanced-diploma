@@ -4,9 +4,18 @@
  */
 
 import GameState from '../GameState';
-import initTestGame from './initTestGame';
+import GameStateService from '../GameStateService';
+import GamePlay from '../GamePlay';
+import GameController from '../GameController';
 
-const gameCtrl = initTestGame();
+const gamePlay = new GamePlay();
+gamePlay.bindToDOM(document.querySelector('#game-container'));
+
+const stateService = new GameStateService(localStorage);
+
+const gameCtrl = new GameController(gamePlay, stateService);
+
+localStorage.clear();
 
 gameCtrl.init();
 

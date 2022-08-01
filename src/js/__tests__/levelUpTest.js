@@ -20,20 +20,17 @@ describe('creating new game', () => {
   gameCtrl.init();
 
   test('check start data', () => {
-    expect(GameState.state.maxScore).toBe(0);
+    expect(GameState.maxScore).toBe(0);
   });
 
   test('level up method', () => {
-    const computerTeam = gameCtrl.getCharactersFromTeam('computer');
     const userTeam = gameCtrl.getCharactersFromTeam('user');
     userTeam[0].character.health = 50;
     userTeam[1].character.health = 10;
-    computerTeam.splice(0);
     expect(gameCtrl.characterPositions.length).toBe(4);
-
+    gameCtrl.computerTeam = null;
     gameCtrl.levelUp();
-
-    expect(GameState.state.level).toBe(2);
+    expect(GameState.level).toBe(2);
     expect(gameCtrl.characterPositions.length).toBe(6);
   });
 
@@ -51,6 +48,6 @@ describe('creating new game', () => {
 
   test('save maxScore after click on new game', () => {
     gameCtrl.gamePlay.newGameEl.click();
-    expect(GameState.state.maxScore).toBe(60);
+    expect(GameState.maxScore).toBe(60);
   });
 });

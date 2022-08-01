@@ -15,9 +15,8 @@ export default class GameController {
   }
 
   init() {
-    // load gameState
     const data = this.stateService.load();
-    // draw Ui
+
     if (!data) {
       this.gamePlay.drawUi(themes.prairie);
       GameState.from(
@@ -39,24 +38,24 @@ export default class GameController {
     if (this.characterPositions) {
       this.gamePlay.redrawPositions(this.characterPositions);
     } else {
-      this.startGame(GameState.level);
+      this.startGame(GameState.level, false);
     }
   }
 
-  startGame(level) {
+  startGame(level, holdPositions) {
     this.setTheme(level);
 
     if (this.userTeam) {
-      this.userTeam = new Team(this.userTeam.team, level, level + 1);
+      this.userTeam = new Team(this.userTeam.team, level, 'user');
     } else {
       this.userTeam = new Team();
     }
 
-    if (!this.computerTeam) {
-      this.computerTeam = new Team([], level, level + 1);
+    if (!this.computerTeam || this.computerTeam.team.length === 0) {
+      this.computerTeam = new Team([], level, 'computer', this.userTeam.team.length);
     }
 
-    if (!this.characterPositions) {
+    if (!holdPositions) {
       this.characterPositions = drawUp(this.userTeam.team, 'user')
         .concat(drawUp(this.computerTeam.team, 'computer'));
     }
@@ -370,19 +369,13 @@ export default class GameController {
       );
       character.defence = changedDefence;
     }
-    // save game
-    GameState.userTeam = this.userTeam.team;
-    this.startGame(GameState.level);
+    this.startGame(GameState.level, false);
   }
 
   /*
   * save current game state
   */
   saveGame() {
-    // GameState.characterPositions = this.characterPositions;
-    // GameState.userTeam = this.userTeam;
-    // GameState.computerTeam = this.computerTeam;
-
     const characters = [];
 
     for (const char of this.characterPositions) {
@@ -424,7 +417,7 @@ export default class GameController {
     this.userTeam.level = GameState.level;
     this.computerTeam.team = computerTeam;
     this.computerTeam.level = GameState.level;
-    this.startGame(GameState.level);
+    this.startGame(GameState.level, true);
   }
 
   resetListeners() {
