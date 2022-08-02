@@ -73,6 +73,8 @@ export default function getSpace(index, distance, action, ocuppiedCells = []) {
           if (leftDir >= 0 && leftDir <= 63) {
             if ((leftDir + 1) % 8 !== 0) {
               result.push(leftDir);
+            } else {
+              break;
             }
           }
         }
