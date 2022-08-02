@@ -316,7 +316,7 @@ export default class GameController {
 
   gameLoop() {
     for (const character of this.characterPositions) {
-      if (character.character.health <= 99) {
+      if (character.character.health <= 0) {
         this.characterPositions.splice(this.characterPositions.indexOf(character), 1);
         for (const team of [this.userTeam, this.computerTeam]) {
           if (team.team.includes(character.character)) {
