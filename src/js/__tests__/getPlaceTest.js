@@ -8,7 +8,7 @@ test('check attack space', () => {
 
   expect(getSpace(63, swordsman.attackDistance, 'attack')).toEqual(new Set([54, 55, 62]));
   expect(getSpace(56, swordsman.attackDistance, 'attack')).toEqual(new Set([48, 49, 57]));
-  expect(getSpace(24, bowman.attackDistance, 'attack')).toEqual(new Set([16, 17, 25, 33, 32, 8, 9, 10, 18, 26, 34, 42, 41, 40]))
+  expect(getSpace(24, bowman.attackDistance, 'attack')).toEqual(new Set([16, 17, 25, 33, 32, 8, 9, 10, 18, 26, 34, 42, 41, 40]));
 });
 
 test('check move space', () => {
