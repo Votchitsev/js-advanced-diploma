@@ -39,4 +39,8 @@ test('check move space', () => {
   expect(getSpace(25, bowman.moveDistance, 'move')).toStrictEqual(
     new Set([16, 17, 9, 18, 11, 26, 27, 34, 43, 33, 41, 32, 24]),
   );
+
+  expect(getSpace(49, bowman.moveDistance, 'move')).toStrictEqual(
+    new Set([40, 41, 33, 42, 35, 50, 51, 58, 57, 56, 48]),
+  );
 });
