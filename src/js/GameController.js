@@ -18,7 +18,7 @@ export default class GameController {
     const data = this.stateService.load();
 
     if (!data) {
-      this.gamePlay.drawUi(themes.prairie); // TODO
+      this.gamePlay.drawUi(themes.prairie);
       GameState.from(
         {
           choosenCharacter: null,

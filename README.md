@@ -52,6 +52,8 @@
 
 *   `npm install` 
 
+*   `npm run build`
+
 *   `npm run serve`
 
 ## <a name="lassFuncDesc"></a>       Описание функций и классов проекта

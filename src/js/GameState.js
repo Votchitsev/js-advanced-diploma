@@ -92,9 +92,6 @@ export default class GameState {
       objectClasses.push(character);
     }
 
-    // if (objectClasses.length === 1) {
-    //   return objectClasses[0];
-    // }
     return objectClasses;
   }
 
