@@ -12,6 +12,8 @@
     * [Game State](#GameState)
     * [generators](#generators)
     * [utils.js](#utils)
+    * [moveOptions](#moveOptions)
+    * [characters](#characters)
 
 
 ## <a name="desc"></a>    Описание игры 
