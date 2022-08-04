@@ -1,6 +1,6 @@
 import Swordsman from '../characters/swordsman';
 import Bowman from '../characters/bowman';
-import getSpace from '../characters/moveOptions';
+import getSpace from '../moveOptions';
 
 test('check attack space', () => {
   const swordsman = new Swordsman(1, 100);

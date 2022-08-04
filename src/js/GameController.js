@@ -3,7 +3,7 @@ import Team from './Team';
 import GamePlay from './GamePlay';
 import GameState from './GameState';
 import cursors from './cursors';
-import getSpace from './characters/moveOptions';
+import getSpace from './moveOptions';
 import ComputerAction from './ComputerAction';
 import drawUp from './drawUp';
 import PositionedCharacter from './PositionedCharacter';
@@ -18,7 +18,7 @@ export default class GameController {
     const data = this.stateService.load();
 
     if (!data) {
-      this.gamePlay.drawUi(themes.prairie);
+      this.gamePlay.drawUi(themes.prairie); // TODO
       GameState.from(
         {
           choosenCharacter: null,
@@ -356,13 +356,13 @@ export default class GameController {
       if (character.health > 100) {
         character.health = 100;
       }
-      // up attack
+
       const changedAttack = Math.max(
         character.attack,
         character.attack * (1.8 - (healthBefore / 100)),
       );
       character.attack = changedAttack;
-      // up defence
+
       const changedDefence = Math.max(
         character.defence,
         character.defence * (1.8 - (healthBefore / 100)),
@@ -372,9 +372,6 @@ export default class GameController {
     this.startGame(GameState.level, false);
   }
 
-  /*
-  * save current game state
-  */
   saveGame() {
     const characters = [];
 
