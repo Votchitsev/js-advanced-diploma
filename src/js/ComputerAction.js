@@ -1,4 +1,4 @@
-import getSpace from './characters/moveOptions';
+import getSpace from './moveOptions';
 import GameState from './GameState';
 
 export default class ComputerAction {

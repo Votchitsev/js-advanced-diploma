@@ -3,7 +3,7 @@ import Team from './Team';
 import GamePlay from './GamePlay';
 import GameState from './GameState';
 import cursors from './cursors';
-import getSpace from './characters/moveOptions';
+import getSpace from './moveOptions';
 import ComputerAction from './ComputerAction';
 import drawUp from './drawUp';
 import PositionedCharacter from './PositionedCharacter';
