@@ -67,6 +67,10 @@ export default class GameController {
     this.gamePlay.redrawPositions(this.characterPositions);
 
     GameState.status = 'run';
+
+    if (GameState.turn === 'computer') {
+      this.computerAction();
+    }
   }
 
   setListeners() {
