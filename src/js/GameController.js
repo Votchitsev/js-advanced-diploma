@@ -229,10 +229,10 @@ export default class GameController {
   attack(attackIndex) {
     const enemyCharacter = this.getCharacterFromCell(attackIndex);
     const currentLevel = GameState.level;
-    const damage = Math.max(
+    const damage = Math.floor(Math.max(
       GameState.choosenCharacter.character.attack - enemyCharacter.character.defence,
       GameState.choosenCharacter.character.attack * 0.1,
-    );
+    ));
     this.gamePlay.showDamage(attackIndex, `-${damage}`)
       .then(() => {
         enemyCharacter.character.health -= damage;
