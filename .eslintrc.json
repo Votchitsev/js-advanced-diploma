@@ -14,6 +14,7 @@
     "rules": {
         "no-restricted-syntax": "off",
         "no-alert": "off",
-        "arrow-parens": "off"
+        "arrow-parens": "off",
+        "import/no-extraneous-dependencies": "off"
     }
 }
