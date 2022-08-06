@@ -1,4 +1,5 @@
-# Retro Game
+# Retro Game [![Build status](https://ci.appveyor.com/api/projects/status/uso2bkces755145p?svg=true)](https://ci.appveyor.com/project/Votchitsev/js-advanced-diploma)
+
 ##### дипломный проект курса "JavaScript: углубленный курс вэб-разработки"
 
 ## Навигация
@@ -43,7 +44,7 @@
 Баллы, которые набирает игрок за уровень равны сумме жизней оставшихся в живых персонажей.
 
 ## <a name="start"></a>     Запуск
-Проект развёрнут по адресу `https://votchitsev.github.io/js-advanced-diploma/`.     
+Проект развёрнут по адресу https://votchitsev.github.io/js-advanced-diploma/.     
 Для запуска проекта локально необходимо выполнить следующие действия:
 
 *   `git clone https://github.com/Votchitsev/js-advanced-diploma.git`
