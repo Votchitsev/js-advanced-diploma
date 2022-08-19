@@ -23,11 +23,13 @@ export default class Team {
   }
 
   allowCharacterList() {
-    if (this.level === 1 && this.player === 'user') {
-      return [Bowman, Swordsman];
+    if (this.player === 'user') {
+      if (this.level === 1) {
+        return [Bowman, Swordsman];
+      }
+      return [Bowman, Swordsman, Magician];
     }
-
-    return [Bowman, Daemon, Magician, Swordsman, Undead, Vampire];
+    return [Vampire, Undead, Daemon];
   }
 
   count() {
